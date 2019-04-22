@@ -1,0 +1,30 @@
+--- 
+# Add non-hashed ssh key to known_hosts
+# If `the -H option is used, e.g. ssh-keyscan -H`, the hostname/IP is hashed and will change everytime
+# This will cause the 'known_hosts' file to get a new duplicate key each time the playbook is run.
+# See getHashedSSHKey.block.yml 
+
+- hosts: newhosts
+  gather_facts: no
+
+  tasks:
+  - name: get ssh ecdsa key
+    lineinfile:
+      path: ~/.ssh/known_hosts
+      create: yes
+      line: "{{ lookup('pipe', 'ssh-keyscan -trsa ' + inventory_hostname) }}"
+    delegate_to: 127.0.0.1
+
+#  - name: get ssh rsa key
+#    lineinfile:
+#      path: ~/.ssh/known_hosts
+#      create: yes
+#      line: "{{ lookup('pipe', 'ssh-keyscan -tecdsa ' + inventory_hostname) }}"
+#    delegate_to: 127.0.0.1
+#
+#  - name: get ssh ed25519 key
+#    lineinfile:
+#      path: ~/.ssh/known_hosts
+#      create: yes
+#      line: "{{ lookup('pipe', 'ssh-keyscan -ted25519 ' + inventory_hostname) }}"
+#    delegate_to: 127.0.0.1
