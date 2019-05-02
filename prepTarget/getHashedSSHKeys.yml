@@ -1,6 +1,7 @@
 ---
 # Using 'blockinfile', ansible will replace the same block of text if the 'block' text changes. 
-# So this works well with the '-H' option of the 'ssh-keyscan' command (Hash changes on each run)
+# So this works well with a single host the '-H' option of the 'ssh-keyscan' command (Hash changes on each run)
+# See prepApt.yml for handling multiple targets: use `marker`
 
 - hosts: newhosts
   gather_facts: no

@@ -1,0 +1,62 @@
+---
+# Prep new apt (debian, ubuntu) target host
+# See README.md for inventory file with variables
+#
+# ansible-playbook prepApt.yml -k -K
+# ansible-playbook prepApt.yml --ask-pass --ask-sudo-pass
+#
+# Get ssh key from target
+# kill unattended upgrade
+# Install Python, apt upgrade, apt cleanup
+# Copy ssh-key to authorized_keys file on the target
+
+
+- hosts: newapt
+  gather_facts: False
+  
+  # For Ubuntu KVM
+  become: yes
+  become_user: root
+
+  tasks:
+    - name: get ssh key
+      delegate_to: localhost
+      blockinfile:
+        path: ~/.ssh/known_hosts
+        create: yes
+        block: "{{ lookup('pipe', 'ssh-keyscan -H ' + ansible_host) }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK: {{ inventory_hostname }}"
+
+    # Ubuntu 16.04 KVM may have an apt dpkg lock held by the unattedned-upgrade
+    # which will not allow and upgrade or python install.
+    # Just kill the process and ignore the error if it does not exist
+    - name: kill unattended-upgrade
+      raw: pkill unattended-upgr
+      ignore_errors: yes
+
+    - name: install python if needed
+      raw: test -e /usr/bin/python || (apt update && apt install -y python)
+
+    # upgrade may take some time (several minutes)
+    - name: upgrade
+      apt: 
+        update_cache: yes
+        upgrade: yes
+
+    - name: cleanup
+      apt:
+        autoclean: yes
+        autoremove: yes
+
+    - name: copy ssh key to target host
+      authorized_key:
+        user: "{{ ansible_user }}"
+        exclusive: no
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+
+
+#    - name: Copy ssh key
+#      delegate_to: localhost
+#      raw: "ssh-copy-id {{ ansible_user }}@{{ ansible_host }}"
+
