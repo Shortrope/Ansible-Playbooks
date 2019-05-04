@@ -1,6 +1,5 @@
 ---
 # Prep new apt (debian, ubuntu) target host
-# See README.md for inventory file with variables
 #
 # ansible-playbook prepApt.yml -k -K
 # ansible-playbook prepApt.yml --ask-pass --ask-sudo-pass
@@ -24,7 +23,7 @@
       blockinfile:
         path: ~/.ssh/known_hosts
         create: yes
-        block: "{{ lookup('pipe', 'ssh-keyscan -H ' + ansible_host) }}"
+        block: "{{ lookup('pipe', 'ssh-keyscan -H ' + ansible_host + ' 2> /dev/null') }}"
         marker: "# {mark} ANSIBLE MANAGED BLOCK: {{ inventory_hostname }}"
 
     # Ubuntu 16.04 KVM may have an apt dpkg lock held by the unattedned-upgrade
