@@ -17,7 +17,7 @@
         var: ansible_processor
 
     - debug:
-        var: ansible_default_ipv4.gateway
+        msg: "GateWay address for {{ ansible_hostname }} is: {{ ansible_default_ipv4.gateway }}"
 
 
     #- name: get ssh key
