@@ -1,0 +1,35 @@
+---
+# Example: debug, register a variable, use facts
+
+- hosts: newapt
+  gather_facts: yes
+  become: yes
+
+  tasks:
+
+    # Get all hostvars
+    # Lots O' output. Redirect to a file on the cli
+    # ansible-playbook dbug.yml > hostvars.json
+    #- debug:
+    #    var: hostvars[inventory_hostname]
+
+    - debug:
+        var: ansible_processor
+
+    - debug:
+        var: ansible_default_ipv4.gateway
+
+
+    #- name: get ssh key
+    #  delegate_to: localhost
+    #  blockinfile:
+    #    path: ~/.ssh/known_hosts
+    #    create: yes
+    #    block: "{{ lookup('pipe', 'ssh-keyscan -H ' + ansible_host + ' 2> /dev/null') }}"
+    #    marker: "# {mark} ANSIBLE MANAGED BLOCK: {{ inventory_hostname }}"
+    #  register: ssh_keys
+    #
+    #- debug:
+    #    var: ssh_keys
+
+
