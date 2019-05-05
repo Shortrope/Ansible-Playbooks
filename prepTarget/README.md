@@ -15,3 +15,16 @@ The docs say the variables should be defined in separate file but will do this f
     or
     ansible-playbook prepApt.yml --ask-pass --ask-sudo-pass
 
+## Create a password hash
+
+### Get sha512 password hash:
+
+    ansible localhost -m debug -a "msg={{ 'ansible' | password_hash('sha512') }}"
+
+### Get sha512 password hash w a specific salt:
+
+    ansible localhost -m debug -a "msg={{ 'ansible' | password_hash('sha512', 'thesecretsalt') }}"
+
+### Idempotent method to generate unique hashes per system using a salt that is consistent between runs
+
+    ansible localhost -m debug -a "msg={{ 'ansible' | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"o
